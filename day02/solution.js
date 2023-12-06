@@ -1,11 +1,6 @@
 const { readFileSync } = require('fs');
 const inputLines = readFile('input.txt');
 
-const mockData = [
-    'Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green',
-    'Game 2: 9 green, 1 blue, 12 red; 1 blue, 18 green, 8 red; 2 blue, 6 green, 13 red; 3 blue, 13 red, 7 green; 5 blue, 4 red, 4 green; 6 blue, 7 green, 4 red',
-];
-
 function readFile(filename) {
     const contents = readFileSync(`${__dirname}/${filename}`, 'utf-8');
     const arr = contents.split(/\r?\n/);
@@ -13,40 +8,7 @@ function readFile(filename) {
     return arr;
 }
 
-function findColonIndex(inputString) {
-    return inputString.search(/:/);
-}
-
-function returnGameStringWithoutId(inputString) {
-    return inputString.slice(findColonIndex(inputString) + 2);
-}
-
-function parseId(inputString) {
-    return inputString.slice(5, findColonIndex(inputString));
-}
-
-function partOne(inputArray) {
-    let result = [];
-
-    for (let line of inputArray) {
-        let gameObject = {
-            id: parseInt(parseId(line)),
-            red: 0,
-            green: 0,
-            blue: 0,
-        };
-
-        result.push(gameObject);
-    }
-
-    return result;
-}
-
-function findLargestCubeCount(inputColor, inputString) {
-    for ()
-}
-
-function isCharDigit(char) {
+function isDigit(char) {
     if (char.match(/[1-9]/g)) {
         return true;
     } else {
@@ -54,6 +16,97 @@ function isCharDigit(char) {
     }
 }
 
-console.log(partOne(mockData));
+function extractMaxScores() {
+    let games = [];
 
-module.exports = { parseId, returnGameStringWithoutId, partOne };
+    for (let line of inputLines) {
+        const gameObject = {
+            id: 0,
+            maxRed: 0,
+            maxGreen: 0,
+            maxBlue: 0,
+        };
+
+        let redResults = [];
+        let greenResults = [];
+        let blueResults = [];
+
+        gameObject.id = parseInt(line.slice(5, line.search(/:/)));
+        const gameStringWithoutId = line.slice(line.search(/:/) + 1);
+
+        for (i = 0; i < gameStringWithoutId.length; i++) {
+            const char = gameStringWithoutId[i];
+            if (char === ' ' && isDigit(gameStringWithoutId[i + 1])) {
+                const gameSubstring = gameStringWithoutId.substring(i + 1);
+                const stopIndex = gameSubstring.search(/ /);
+
+                switch (gameSubstring[stopIndex + 1]) {
+                    case 'r':
+                        redResults.push(
+                            parseInt(gameSubstring.substring(0, stopIndex))
+                        );
+                        break;
+                    case 'g':
+                        greenResults.push(
+                            parseInt(gameSubstring.substring(0, stopIndex))
+                        );
+                        break;
+                    case 'b':
+                        blueResults.push(
+                            parseInt(gameSubstring.substring(0, stopIndex))
+                        );
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        redResults.sort(function (a, b) {
+            return b - a;
+        });
+        greenResults.length > 1 &&
+            greenResults.sort(function (a, b) {
+                return b - a;
+            });
+        blueResults.sort(function (a, b) {
+            return b - a;
+        });
+
+        gameObject.maxRed = redResults[0];
+        gameObject.maxGreen = greenResults[0];
+        gameObject.maxBlue = blueResults[0];
+
+        games.push(gameObject);
+    }
+
+    return games;
+}
+
+function partOne() {
+    const games = extractMaxScores();
+    let results = [];
+    let sum = 0;
+
+    const redCubes = 12;
+    const greenCubes = 13;
+    const blueCubes = 14;
+
+    for (let game of games) {
+        if (
+            game.maxRed <= redCubes &&
+            game.maxGreen <= greenCubes &&
+            game.maxBlue <= blueCubes
+        ) {
+            results.push(game.id);
+        }
+    }
+
+    for (i = 0; i < results.length; i++) {
+        sum += results[i];
+    }
+
+    return sum;
+}
+
+console.log(partOne());

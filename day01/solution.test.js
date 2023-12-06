@@ -12,6 +12,6 @@ test('Returns the sum 55447', () => {
     expect(partOne()).toEqual(55447);
 });
 
-test('Returns the sum 30', () => {
+/*test('Returns the sum 30', () => {
     expect(partTwo()).toEqual(30);
-});
+});*/

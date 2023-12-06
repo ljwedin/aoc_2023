@@ -79,7 +79,6 @@ function partTwo() {
         console.log(number);
         sum += Number(number);
     }
-    console.log(sum);
 }
 
 function isCharDigit(char) {
