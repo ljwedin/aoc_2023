@@ -109,4 +109,22 @@ function partOne() {
     return sum;
 }
 
-console.log(partOne());
+function partTwo() {
+    const games = extractMaxScores();
+    let results = [];
+    let sum = 0;
+
+    for (let gameObject of games) {
+        let powerSum =
+            gameObject.maxRed * gameObject.maxGreen * gameObject.maxBlue;
+        results.push(powerSum);
+    }
+
+    for (let number of results) {
+        sum += number;
+    }
+
+    return sum;
+}
+
+console.log(partTwo());
