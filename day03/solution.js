@@ -8,17 +8,6 @@ function readFile(filename) {
     return arr;
 }
 
-const mockData = [
-    '.679....*662....71............................805..........862.680...................................................................687....',
-    '............*....-..811..........846..855......*.............*..$........230.92@............................=.....................92........',
-    '35/.......360..........#....664.....=.*...881...677...934.780.......426.*..........8......654.....*959.....539..........21.........*........',
-    '.%...................+.........*......379..*.........*.........=.........969........*........*.976..............872....*....../....579......',
-    '......*566......652...809....482.394......492..303.650..../...38....%...............106...385..................#.....793..484.865...........',
-    '..................*................*..347.......*.........220.....349...691...392*..................18..797.......................+.........',
-    '.679.....662....71............................805..........862.680...................................................................687..87',
-];
-// Line 0 should return 662 + 71 + 805 + 680 = 2218
-
 function isDigit(char) {
     if (char.match(/[0-9]/g)) {
         return true;
@@ -44,10 +33,16 @@ function extractDigits(inputString, lineIndex) {
     let startingIndex = null;
     let endingIndex = null;
     const isFirstLine = lineIndex === 0 ? true : false;
-    const isLastLine = lineIndex === 139 ? true : false;
+    const isLastLine = lineIndex === inputLines.length - 1 ? true : false;
 
     for (let i = 0; i < inputString.length; i++) {
         const char = inputString[i];
+        if (i === 28 && lineIndex === 137) {
+            console.log('28 char: ', char);
+        }
+        if (i === 29 && lineIndex === 137) {
+            console.log('29 char is digit: ', isDigit(char));
+        }
 
         if (isDigit(char)) {
             if (currentDigits === '') {
@@ -74,8 +69,8 @@ function extractDigits(inputString, lineIndex) {
     }
 
     if (currentDigits.length > 0) {
-        result.push(parseInt(currentDigits));
         endingIndex = inputString.length - 1;
+        startingIndex = endingIndex - (currentDigits.length - 1);
 
         if (
             isValidEnginePart(
@@ -108,16 +103,18 @@ function isValidEnginePart(
     let thisLine = inputLines[lineIndex];
     const startIndexExtended = numberStartIndex == 0 ? 0 : numberStartIndex - 1;
     const stopIndexExtended =
-        numberStopIndex == 140 ? 140 : numberStopIndex + 1;
+        numberStopIndex == thisLine.length - 1
+            ? thisLine.length - 1
+            : numberStopIndex + 1;
     const previousLineIndex = isFirstLine ? 0 : lineIndex - 1;
-    const nextLineIndex = isLastLine ? 8 : lineIndex + 1;
+    const nextLineIndex = isLastLine ? inputLines.length - 1 : lineIndex + 1;
     const previousLineSlice = inputLines[previousLineIndex].slice(
         startIndexExtended,
-        stopIndexExtended
+        stopIndexExtended + 1
     );
     const nextLineSlice = inputLines[nextLineIndex].slice(
         startIndexExtended,
-        stopIndexExtended
+        stopIndexExtended + 1
     );
 
     if (
@@ -142,93 +139,12 @@ function isValidEnginePart(
     return false;
 }
 
-function isValidEnginePartOld(
-    lineIndex,
-    numberStartIndex,
-    numberStopIndex,
-    isFirstLine,
-    isLastLine
-) {
-    let previousLine, previousLineSlice, nextLine, nextLineSlice;
-    let thisLine = inputLines[lineIndex];
-
-    if (numberStartIndex > 0 && isSymbol(thisLine[numberStartIndex - 1])) {
-        return true;
-    }
-
-    if (numberStopIndex > 0 && isSymbol(thisLine[numberStopIndex + 1])) {
-        return true;
-    }
-
-    if (isFirstLine) {
-        nextLine = inputLines[lineIndex + 1];
-        nextLineSlice = nextLine.slice(
-            numberStartIndex == 0 ? numberStartIndex - 1 : numberStartIndex,
-            numberStopIndex == 8 /* 140 */
-                ? numberStopIndex + 1
-                : numberStopIndex
-        );
-
-        for (let char of nextLineSlice) {
-            if (isSymbol(char)) {
-                return true;
-            }
-        }
-    } else if (isLastLine) {
-        previousLine = inputLines[lineIndex - 1];
-        previousLineSlice = previousLine.slice(
-            numberStartIndex == 0 ? numberStartIndex - 1 : numberStartIndex,
-            numberStopIndex == 8 /* 140 */
-                ? numberStopIndex + 1
-                : numberStopIndex
-        );
-
-        for (let char of previousLineSlice) {
-            if (isSymbol(char)) {
-                return true;
-            }
-        }
-    } else {
-        nextLine = inputLines[lineIndex + 1];
-        previousLine = inputLines[lineIndex - 1];
-
-        nextLineSlice = nextLine.slice(
-            numberStartIndex == 0 ? numberStartIndex - 1 : numberStartIndex,
-            numberStopIndex == 8 /* 140 */
-                ? numberStopIndex + 1
-                : numberStopIndex
-        );
-
-        previousLineSlice = previousLine.slice(
-            numberStartIndex == 0 ? numberStartIndex - 1 : numberStartIndex,
-            numberStopIndex == 8 /* 140 */
-                ? numberStopIndex + 1
-                : numberStopIndex
-        );
-
-        for (let char of nextLineSlice) {
-            if (isSymbol(char)) {
-                return true;
-            }
-        }
-
-        for (let char of previousLineSlice) {
-            if (isSymbol(char)) {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
 function partOne() {
     const result = [];
     let sum = 0;
 
     for (i = 0; i < inputLines.length; i++) {
-        console.log(`Index: ${i}, result: ${extractDigits(inputLines[i], i)}`);
-        result.push(extractDigits(mockData[i], i));
+        result.push(extractDigits(inputLines[i], i));
     }
 
     for (let number of result) {
